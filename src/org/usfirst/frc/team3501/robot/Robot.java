@@ -3,18 +3,12 @@ package org.usfirst.frc.team3501.robot;
 
 import java.io.UnsupportedEncodingException;
 
-import org.usfirst.frc.team3501.robot.commands.ExampleCommand;
-import org.usfirst.frc.team3501.robot.subsystems.ExampleSubsystem;
-
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -25,15 +19,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class Robot extends IterativeRobot {
 
-  public static final ExampleSubsystem exampleSubsystem = new ExampleSubsystem();
-  public static OI oi;
-
   static I2C Wire = new I2C(Port.kOnboard, 42);
   Joystick joy = new Joystick(1);
   byte[] ReadData = new byte[3];
-
-  Command autonomousCommand;
-  SendableChooser chooser;
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -41,11 +29,7 @@ public class Robot extends IterativeRobot {
    */
   @Override
   public void robotInit() {
-    oi = new OI();
-    chooser = new SendableChooser();
-    chooser.addDefault("Default Auto", new ExampleCommand());
-    // chooser.addObject("My Auto", new MyAutoCommand());
-    SmartDashboard.putData("Auto mode", chooser);
+
   }
 
   /**
@@ -76,18 +60,7 @@ public class Robot extends IterativeRobot {
    */
   @Override
   public void autonomousInit() {
-    autonomousCommand = (Command) chooser.getSelected();
 
-    /*
-     * String autoSelected = SmartDashboard.getString("Auto Selector",
-     * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand =
-     * new MyAutoCommand(); break; case "Default Auto": default:
-     * autonomousCommand = new ExampleCommand(); break; }
-     */
-
-    // schedule the autonomous command (example)
-    if (autonomousCommand != null)
-      autonomousCommand.start();
   }
 
   /**
@@ -100,12 +73,7 @@ public class Robot extends IterativeRobot {
 
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
-    if (autonomousCommand != null)
-      autonomousCommand.cancel();
+
   }
 
   /**
@@ -116,21 +84,9 @@ public class Robot extends IterativeRobot {
     Scheduler.getInstance().run();
 
     sendMessage();
+    // uncomment statement below to call the method
+    // for the Roborio to receive a message from the coprocessor
     // receiveMessage();
-
-    // boolean received = Wire.transaction(null, 0, dataReceived,
-    // dataReceived.length);
-    //
-    // try {
-    // message = new String(dataReceived, "UTF-8");
-    // } catch (UnsupportedEncodingException e) {
-    // // TODO Auto-generated catch block
-    // e.printStackTrace();
-    // }
-
-    // if (message.equals("go"))
-    // System.out.println("Message received");
-    // System.out.println(message);
   }
 
   public void sendMessage() {
@@ -144,20 +100,22 @@ public class Robot extends IterativeRobot {
   }
 
   public void receiveMessage() {
+    // not currently a working solution, however our research has lead to the
+    // conclusion that the bug is due to an encoding error
     byte[] dataReceived = new byte[3];
     String message = "";
-    while (Wire.readOnly(dataReceived, 3) == false) {
-      System.out.printf("%02x\n", dataReceived[0]);
-      try {
-        message += new String(dataReceived, "US-ASCII");
-      } catch (UnsupportedEncodingException e) {
-        e.printStackTrace();
-      }
-      System.out.println("In While Loop: " + message);
+    boolean received = Wire.transaction(null, 0, dataReceived,
+        dataReceived.length);
+    try {
+      message = new String(dataReceived, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
     }
 
-    System.out
-        .println("Received data:" + message + ", length:" + message.length());
+    if (message.equals("go"))
+      System.out.println("Message received");
+    else
+      System.out.println("Not received");
   }
 
   /**

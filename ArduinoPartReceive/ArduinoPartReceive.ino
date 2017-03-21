@@ -25,7 +25,7 @@ void receiveEvent(int howMany)
    message += n; 
   }
   Serial.println("received: " + message);
-  if (message == "go") 
+  if (message == "message") 
   {
     Serial.println("message received");
   }

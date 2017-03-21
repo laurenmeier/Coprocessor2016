@@ -1,5 +1,5 @@
 #include <Wire.h>
-byte message = (byte)'a';
+byte message = (byte)'message';
 
 void setup()
 {

@@ -21,7 +21,6 @@ public class Robot extends IterativeRobot {
 
   static I2C Wire = new I2C(Port.kOnboard, 42);
   Joystick joy = new Joystick(1);
-  byte[] ReadData = new byte[3];
 
   /**
    * This function is run when the robot is first started up and should be used
@@ -90,7 +89,7 @@ public class Robot extends IterativeRobot {
   }
 
   public void sendMessage() {
-    String WriteString = "go";
+    String WriteString = "message";
     char[] CharArray = WriteString.toCharArray();
     byte[] WriteData = new byte[CharArray.length];
     for (int i = 0; i < CharArray.length; i++) {
@@ -112,7 +111,7 @@ public class Robot extends IterativeRobot {
       e.printStackTrace();
     }
 
-    if (message.equals("go"))
+    if (message.equals("message"))
       System.out.println("Message received");
     else
       System.out.println("Not received");
